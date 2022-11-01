@@ -74,6 +74,7 @@ const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 const workoutHead = document.querySelector(`.workout__head`);
 const map = document.querySelector(`#map`);
+const editForm = document.querySelector(`.editForm`);
 
 // const editWorkout = document.querySelector(`.edit__workout`);
 
@@ -150,6 +151,14 @@ class App {
     form.classList.add(`hidden`);
     setTimeout(() => (form.style.display = `grid`), 1000);
   }
+  _hideEditForm() {
+    // Empty inputs
+    // prettier-ignore
+    inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = ``;
+    editForm.style.display = `none`;
+    editForm.classList.add(`hidden`);
+    setTimeout(() => (editForm.style.display = `grid`), 1000);
+  }
 
   _toggleElevationField() {
     inputElevation.closest(`.form__row`).classList.toggle(`form__row--hidden`);
@@ -221,73 +230,6 @@ class App {
     this._setLocalStorage();
   }
 
-  _editWorkout(e) {
-    const workoutEl = e.target.closest(`.workout`);
-
-    const workout = this.#workouts.find(
-      work => work.id === workoutEl.dataset.id
-    );
-    this._renderEditForm(workout);
-    // console.log(workout);
-  }
-
-  // ???????????????????????????????????????????????????????????????????????????????????????????????
-  //  Submit event ?????????????
-  // ???????????????????????????????????????????????????????????????????????????????????????????????
-
-  _renderEditForm(workout) {
-    console.log(workout);
-    console.log(workout.type);
-    let html = `<ul class="workouts">
-    <form class="editForm">
-      <div class="form__row">
-        <label class="form__label">Type</label>
-        <select class="form__input form__input--type">
-        ${
-          workout.type == 'running'
-            ? `<option value="running">Running</option>
-          <option value="cycling">Cycling</option>`
-            : `<option value="cycling">Cycling</option><option value="running">Running</option>`
-        }
-        </select>
-      </div>
-      <div class="form__row">
-        <label class="form__label">Distance</label>
-        <input class="form__input form__input--distance" placeholder="${
-          workout.distance
-        } km" />
-      </div>
-      <div class="form__row">
-        <label class="form__label">Duration</label>
-        <input
-          class="form__input form__input--duration"
-          placeholder="${workout.duration} min"
-        />
-      </div>
-      <div class="form__row ${
-        workout.type == 'running' ? '' : `form__row--hidden`
-      }">
-        <label class="form__label">Cadence</label>
-        <input
-          class="form__input form__input--cadence"
-          placeholder="${workout.cadence} step/min"
-        />
-      </div>
-      <div class="form__row ${
-        workout.type == 'running' ? `form__row--hidden` : ''
-      }">
-        <label class="form__label">Elev Gain</label>
-        <input
-          class="form__input form__input--elevation"
-          placeholder="${workout.elevationGain} meters"
-        />
-      </div>
-      <button type="submit" class="form__btn">OK</button>
-    </form>
-  </ul>`;
-    document.querySelector(`.menu`).insertAdjacentHTML(`afterend`, html);
-  }
-
   _renderWorkoutMarker(
     workout,
     autoPan = true,
@@ -336,9 +278,11 @@ class App {
     // }
   }
 
-  _renderWorkout(workout) {
+  _renderWorkout(workout, add = true, edit = false) {
     let html = `
-       <li class="workout workout--${workout.type}" data-id="${workout.id}">
+       <li class="workout workout--${workout.type}${
+      edit ? ' edit' : ''
+    }" data-id="${workout.id}">
        <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__head hidden">          
             <span class="edit__workout workout__icon"> 
@@ -392,18 +336,18 @@ class App {
           </li>
       `;
 
-    form.insertAdjacentHTML(`afterend`, html);
+    containerWorkouts.insertAdjacentHTML('beforeend', html);
 
     // ???????????????????????????????????????????????????????????????????????????????????????????????
     //  Make editable and deletable the workout and why I cant see the Edit/remove button?????????????
     // ???????????????????????????????????????????????????????????????????????????????????????????????
 
-    // if (adding) {
+    // if (add) {
     //   containerWorkouts.insertAdjacentHTML('afterbegin', html);
     //   // console.log(this.#workouts);
     // }
 
-    // if (editing) {
+    // if (edit) {
     //   // Deleting the old workout and inserting the new one in the same position
     //   const currentWorkout = document.querySelector(
     //     `.workout[data-id="${workout.id}"]`
@@ -411,8 +355,135 @@ class App {
 
     //   currentWorkout.style.display = 'none';
     //   currentWorkout.insertAdjacentHTML('afterend', html);
-    //   currentWorkout.remove();
+    //   // currentWorkout.remove();
     // }
+  }
+
+  _editWorkout(e) {
+    const workoutEl = e.target.closest(`.workout`);
+
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    );
+    console.log(workout);
+    editForm.style.top = `${
+      workoutEl.getBoundingClientRect().top -
+      containerWorkouts.getBoundingClientRect().top +
+      containerWorkouts.scrollTop
+    }px`;
+
+    if (workout.type === `running`) {
+    }
+    editForm.classList.remove(`hidden`);
+    workoutEl.classList.add(`edit`);
+
+    const attributeKeys = Object.keys(workout).slice(4, 8);
+
+    attributeKeys.forEach(key => {
+      if (typeof workout[key] === `string`) {
+        this._toggleElevationField();
+
+        /////////////////////////////////////////////////////
+        // Need tu change cadence to Elev Gain if is cycling!!!!!!!!!!!!!!!!
+        /////////////////////////////////////////////////////
+
+        editForm.querySelector(`.form__input--${key}`).value = workout[key];
+        console.log(
+          (editForm.querySelector(`.form__input--${key}`).value = workout[key])
+          // editForm.querySelector(`.form__input--${key}`).children[0].value ==
+          //   workout[key]
+        );
+      }
+      if (typeof workout[key] === 'number') {
+        // console.log(typeof workout[key]);
+        editForm.querySelector(`.form__input--${key}`).setAttribute(
+          `value`,
+          `${workout[key]}`
+          // ${editForm
+          //   .querySelector(`.form__input--${key}`)
+          //   .getAttribute(`placeholder`)}
+        );
+      }
+    });
+
+    // console.log(workoutValues);
+
+    // editForm
+    //   .querySelector(`.form__input--distance`)
+    //   .setAttribute(
+    //     `placeholder`,
+    //     `${workout.distance} ${editForm
+    //       .querySelector(`.form__input--distance`)
+    //       .getAttribute(`placeholder`)}`
+    //   );
+
+    setTimeout(() => editForm.classList.add('animated', 'active'), 0);
+
+    // containerWorkouts.style.overflowY = 'hidden';
+
+    // this._renderEditForm(workout);
+
+    // console.log(workout);
+  }
+
+  // ???????????????????????????????????????????????????????????????????????????????????????????????
+  //  Submit event ?????????????
+  // ???????????????????????????????????????????????????????????????????????????????????????????????
+
+  _renderEditForm(workout) {
+    console.log(workout);
+    console.log(workout.type);
+    //   let html = `
+    //     <div class="form__row">
+    //       <label class="form__label">Type</label>
+    //       <select class="form__input form__input--type">
+    //       ${
+    //         workout.type == 'running'
+    //           ? `<option value="running">Running</option>
+    //         <option value="cycling">Cycling</option>`
+    //           : `<option value="cycling">Cycling</option><option value="running">Running</option>`
+    //       }
+    //       </select>
+    //     </div>
+    //     <div class="form__row">
+    //       <label class="form__label">Distance</label>
+    //       <input class="form__input form__input--distance" placeholder="${
+    //         workout.distance
+    //       } km" />
+    //     </div>
+    //     <div class="form__row">
+    //       <label class="form__label">Duration</label>
+    //       <input
+    //         class="form__input form__input--duration"
+    //         placeholder="${workout.duration} min"
+    //       />
+    //     </div>
+    //     <div class="form__row ${
+    //       workout.type == 'running' ? '' : `form__row--hidden`
+    //     }">
+    //       <label class="form__label">Cadence</label>
+    //       <input
+    //         class="form__input form__input--cadence"
+    //         placeholder="${workout.cadence} step/min"
+    //       />
+    //     </div>
+    //     <div class="form__row ${
+    //       workout.type == 'running' ? `form__row--hidden` : ''
+    //     }">
+    //       <label class="form__label">Elev Gain</label>
+    //       <input
+    //         class="form__input form__input--elevation"
+    //         placeholder="${workout.elevationGain} meters"
+    //       />
+    //     </div>
+    //     <button type="submit" class="form__btn">OK</button>
+    // `;
+    //   containerWorkouts.insertAdjacentHTML('afterbegin', html);
+  }
+
+  _editNewWorkout(e) {
+    e.preventDefault();
+    console.log(`submit`);
   }
 
   _clicksHandle(e) {
@@ -443,6 +514,21 @@ class App {
       }
     }
 
+    // Hiding editForm when click event happening outside of the form
+
+    if (!editForm.matches(`.hidden`)) {
+      if (
+        editForm !== e.target &&
+        !e.target.parentElement.closest(`.editForm`) &&
+        e.target == map
+      ) {
+        document.querySelectorAll(`.workout`).forEach(element => {
+          element.classList.remove(`edit`);
+        });
+        this._hideEditForm();
+      }
+    }
+
     // Show All workout markers on the map
 
     if (e.target.closest(`.menu__option--show`)) {
@@ -453,6 +539,9 @@ class App {
 
     if (e.target.closest(`.edit__workout`)) {
       e.preventDefault;
+      document.querySelectorAll(`.workout`).forEach(element => {
+        element.classList.remove(`edit`);
+      });
       this._editWorkout(e);
     }
   }
