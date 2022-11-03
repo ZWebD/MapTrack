@@ -97,6 +97,10 @@ class App {
     form.addEventListener(`submit`, this._newWorkout.bind(this));
 
     inputType.addEventListener(`change`, this._toggleElevationField);
+    editForm
+      .querySelector('.form__input--type')
+      .addEventListener(`change`, this._toggleEditFormElevationField);
+
     // Click event
     document.body.addEventListener(`click`, this._clicksHandle.bind(this));
 
@@ -163,6 +167,44 @@ class App {
   _toggleElevationField() {
     inputElevation.closest(`.form__row`).classList.toggle(`form__row--hidden`);
     inputCadence.closest(`.form__row`).classList.toggle(`form__row--hidden`);
+  }
+
+  _toggleEditFormElevationField() {
+    editForm
+      .querySelector('.form__input--elevation')
+      .closest(`.form__row`)
+      .classList.toggle(`form__row--hidden`);
+    editForm
+      .querySelector('.form__input--cadence')
+      .closest(`.form__row`)
+      .classList.toggle(`form__row--hidden`);
+  }
+
+  //////////////////////////////////////////////////////////////
+  // When is toggle change the value empty !!!!!!!!!!!!
+  //////////////////////////////////////////////////////////
+
+  _changeEditFormElevationField(e) {
+    if (e === `running`) {
+      editForm
+        .querySelector('.form__input--elevation')
+        .closest(`.form__row`)
+        .classList.add(`form__row--hidden`);
+      editForm
+        .querySelector('.form__input--cadence')
+        .closest(`.form__row`)
+        .classList.remove(`form__row--hidden`);
+    }
+    if (e === `cycling`) {
+      editForm
+        .querySelector('.form__input--elevation')
+        .closest(`.form__row`)
+        .classList.remove(`form__row--hidden`);
+      editForm
+        .querySelector('.form__input--cadence')
+        .closest(`.form__row`)
+        .classList.add(`form__row--hidden`);
+    }
   }
 
   // Instruction is displayed when is no workout or hid when is workout
@@ -381,28 +423,15 @@ class App {
 
     attributeKeys.forEach(key => {
       if (typeof workout[key] === `string`) {
-        this._toggleElevationField();
-
-        /////////////////////////////////////////////////////
-        // Need tu change cadence to Elev Gain if is cycling!!!!!!!!!!!!!!!!
-        /////////////////////////////////////////////////////
-
+        this._changeEditFormElevationField(workout[key]);
         editForm.querySelector(`.form__input--${key}`).value = workout[key];
-        console.log(
-          (editForm.querySelector(`.form__input--${key}`).value = workout[key])
-          // editForm.querySelector(`.form__input--${key}`).children[0].value ==
-          //   workout[key]
-        );
       }
       if (typeof workout[key] === 'number') {
-        // console.log(typeof workout[key]);
-        editForm.querySelector(`.form__input--${key}`).setAttribute(
-          `value`,
-          `${workout[key]}`
-          // ${editForm
-          //   .querySelector(`.form__input--${key}`)
-          //   .getAttribute(`placeholder`)}
-        );
+        editForm
+          .querySelector(
+            `.form__input--${key === `elevationGain` ? `elevation` : key}`
+          )
+          .setAttribute(`value`, `${workout[key]}`);
       }
     });
 
