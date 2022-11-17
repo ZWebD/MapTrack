@@ -6,19 +6,33 @@ class Workout {
   clicks = 0;
 
   constructor(coords, distance, duration) {
-    // this.date=...
-    // this.id=...
     this.coords = coords; //[lat,lng]
     this.distance = distance; // in km
     this.duration = duration; // in min
   }
 
-  _setDescription() {
+  _setDescription(d) {
     // prettier-ignore
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    if (d) {
+      this.date = d;
+    }
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
     this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
       months[this.date.getMonth()]
-    } ${this.date.getDay()}`;
+    } ${this.date.getDate()}`;
   }
   click() {
     this.clicks++;
@@ -27,11 +41,12 @@ class Workout {
 
 class Running extends Workout {
   type = `running`;
-  constructor(coords, distance, duration, cadence) {
+  constructor(coords, distance, duration, cadence, desc = false) {
     super(coords, distance, duration);
-    this.cadence = cadence;
     this.calcPace();
-    this._setDescription();
+    this._setDescription(desc);
+    this.cadence = cadence;
+    console.log(desc);
   }
 
   calcPace() {
@@ -43,12 +58,12 @@ class Running extends Workout {
 
 class Cycling extends Workout {
   type = `cycling`;
-  constructor(coords, distance, duration, elevationGain) {
+  constructor(coords, distance, duration, elevationGain, desc = false) {
     super(coords, distance, duration);
-    this.elevationGain = elevationGain;
-    // this.type = 'cycling';
     this.calcSpeed();
-    this._setDescription();
+    this._setDescription(desc);
+    this.elevationGain = elevationGain;
+    console.log(desc);
   }
 
   calcSpeed() {
@@ -75,8 +90,11 @@ const inputElevation = document.querySelector('.form__input--elevation');
 const workoutHead = document.querySelector(`.workout__head`);
 const map = document.querySelector(`#map`);
 const editForm = document.querySelector(`.editForm`);
-
-// const editWorkout = document.querySelector(`.edit__workout`);
+const inputEditType = editForm.querySelector('.form__input--type');
+const inputEditDistance = editForm.querySelector('.form__input--distance');
+const inputEditDuration = editForm.querySelector('.form__input--duration');
+const inputEditCadence = editForm.querySelector('.form__input--cadence');
+const inputEditElevation = editForm.querySelector('.form__input--elevation');
 
 class App {
   #map;
@@ -97,9 +115,12 @@ class App {
     form.addEventListener(`submit`, this._newWorkout.bind(this));
 
     inputType.addEventListener(`change`, this._toggleElevationField);
+
     editForm
       .querySelector('.form__input--type')
       .addEventListener(`change`, this._toggleEditFormElevationField);
+
+    editForm.addEventListener(`submit`, this._editWorkout.bind(this));
 
     // Click event
     document.body.addEventListener(`click`, this._clicksHandle.bind(this));
@@ -155,10 +176,11 @@ class App {
     form.classList.add(`hidden`);
     setTimeout(() => (form.style.display = `grid`), 1000);
   }
+
   _hideEditForm() {
     // Empty inputs
     // prettier-ignore
-    inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = ``;
+    // inputDistance.value = inputDuration.value = inputCadence.value = inputElevation.value = ``;
     editForm.style.display = `none`;
     editForm.classList.add(`hidden`);
     setTimeout(() => (editForm.style.display = `grid`), 1000);
@@ -320,11 +342,9 @@ class App {
     // }
   }
 
-  _renderWorkout(workout, add = true, edit = false) {
+  _renderWorkout(workout, addNew = true, update = false) {
     let html = `
-       <li class="workout workout--${workout.type}${
-      edit ? ' edit' : ''
-    }" data-id="${workout.id}">
+       <li class="workout workout--${workout.type}" data-id="${workout.id}">
        <h2 class="workout__title">${workout.description}</h2>
           <div class="workout__head hidden">          
             <span class="edit__workout workout__icon"> 
@@ -377,37 +397,34 @@ class App {
           </div>
           </li>
       `;
+    if (addNew) {
+      containerWorkouts.insertAdjacentHTML('afterbegin', html);
+    }
+    if (update) {
+      // Remove the old workout and inserting the new one in the same position
+      const currentWorkout = document.querySelector(
+        `.workout[data-id="${workout.id}"]`
+      );
 
-    containerWorkouts.insertAdjacentHTML('beforeend', html);
-
-    // ???????????????????????????????????????????????????????????????????????????????????????????????
-    //  Make editable and deletable the workout and why I cant see the Edit/remove button?????????????
-    // ???????????????????????????????????????????????????????????????????????????????????????????????
-
-    // if (add) {
-    //   containerWorkouts.insertAdjacentHTML('afterbegin', html);
-    //   // console.log(this.#workouts);
-    // }
-
-    // if (edit) {
-    //   // Deleting the old workout and inserting the new one in the same position
-    //   const currentWorkout = document.querySelector(
-    //     `.workout[data-id="${workout.id}"]`
-    //   );
-
-    //   currentWorkout.style.display = 'none';
-    //   currentWorkout.insertAdjacentHTML('afterend', html);
-    //   // currentWorkout.remove();
-    // }
+      currentWorkout.style.display = 'none';
+      currentWorkout.insertAdjacentHTML('afterend', html);
+      currentWorkout.remove();
+    }
   }
 
-  _editWorkout(e) {
+  _renderEditForm(e) {
     const workoutEl = e.target.closest(`.workout`);
+
+    // Identify workout
 
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
+
     console.log(workout);
+
+    // Put in position the edit form and hid workout
+
     editForm.style.top = `${
       workoutEl.getBoundingClientRect().top -
       containerWorkouts.getBoundingClientRect().top +
@@ -416,103 +433,156 @@ class App {
 
     if (workout.type === `running`) {
     }
+
     editForm.classList.remove(`hidden`);
     workoutEl.classList.add(`edit`);
 
-    const attributeKeys = Object.keys(workout).slice(4, 8);
+    // Taking the attributes names from the object
+
+    const attributeKeys = Object.keys(workout);
 
     attributeKeys.forEach(key => {
-      if (typeof workout[key] === `string`) {
+      if (key == `type`) {
         this._changeEditFormElevationField(workout[key]);
         editForm.querySelector(`.form__input--${key}`).value = workout[key];
       }
-      if (typeof workout[key] === 'number') {
+      if (
+        key == `distance` ||
+        key == `duration` ||
+        key == `cadence` ||
+        key == `elevation`
+      ) {
         editForm
-          .querySelector(
-            `.form__input--${key === `elevationGain` ? `elevation` : key}`
-          )
+          .querySelector(`.form__input--${key}`)
           .setAttribute(`value`, `${workout[key]}`);
       }
     });
-
-    // console.log(workoutValues);
-
-    // editForm
-    //   .querySelector(`.form__input--distance`)
-    //   .setAttribute(
-    //     `placeholder`,
-    //     `${workout.distance} ${editForm
-    //       .querySelector(`.form__input--distance`)
-    //       .getAttribute(`placeholder`)}`
-    //   );
-
     setTimeout(() => editForm.classList.add('animated', 'active'), 0);
-
-    // containerWorkouts.style.overflowY = 'hidden';
-
-    // this._renderEditForm(workout);
-
-    // console.log(workout);
   }
 
-  // ???????????????????????????????????????????????????????????????????????????????????????????????
-  //  Submit event ?????????????
-  // ???????????????????????????????????????????????????????????????????????????????????????????????
-
-  _renderEditForm(workout) {
-    console.log(workout);
-    console.log(workout.type);
-    //   let html = `
-    //     <div class="form__row">
-    //       <label class="form__label">Type</label>
-    //       <select class="form__input form__input--type">
-    //       ${
-    //         workout.type == 'running'
-    //           ? `<option value="running">Running</option>
-    //         <option value="cycling">Cycling</option>`
-    //           : `<option value="cycling">Cycling</option><option value="running">Running</option>`
-    //       }
-    //       </select>
-    //     </div>
-    //     <div class="form__row">
-    //       <label class="form__label">Distance</label>
-    //       <input class="form__input form__input--distance" placeholder="${
-    //         workout.distance
-    //       } km" />
-    //     </div>
-    //     <div class="form__row">
-    //       <label class="form__label">Duration</label>
-    //       <input
-    //         class="form__input form__input--duration"
-    //         placeholder="${workout.duration} min"
-    //       />
-    //     </div>
-    //     <div class="form__row ${
-    //       workout.type == 'running' ? '' : `form__row--hidden`
-    //     }">
-    //       <label class="form__label">Cadence</label>
-    //       <input
-    //         class="form__input form__input--cadence"
-    //         placeholder="${workout.cadence} step/min"
-    //       />
-    //     </div>
-    //     <div class="form__row ${
-    //       workout.type == 'running' ? `form__row--hidden` : ''
-    //     }">
-    //       <label class="form__label">Elev Gain</label>
-    //       <input
-    //         class="form__input form__input--elevation"
-    //         placeholder="${workout.elevationGain} meters"
-    //       />
-    //     </div>
-    //     <button type="submit" class="form__btn">OK</button>
-    // `;
-    //   containerWorkouts.insertAdjacentHTML('afterbegin', html);
-  }
-
-  _editNewWorkout(e) {
+  _editWorkout(e) {
     e.preventDefault();
-    console.log(`submit`);
+
+    // Checking the inputs are valid
+
+    const validInputs = (...inputs) =>
+      inputs.every(inp => Number.isFinite(inp));
+    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
+    let id;
+
+    function error() {
+      if (
+        !validInputs(distance, duration, cadence ? cadence : elevationGain) ||
+        cadence
+          ? !allPositive(distance, duration, cadence)
+          : !allPositive(distance, duration)
+      )
+        return alert(`Inputs have to be positive numbers!`);
+    }
+
+    // Finding the workout what we editing
+
+    document.querySelectorAll(`.workout`).forEach(element => {
+      if (element.classList.contains(`edit`)) {
+        id = element.getAttribute(`data-id`);
+      }
+      element.classList.remove(`edit`);
+    });
+
+    const workoutIndex = this.#workouts.findIndex(workout => workout.id == id);
+    const workout = this.#workouts[workoutIndex];
+
+    // Get data from edit form
+
+    const type = inputEditType.value;
+    const distance = +inputEditDistance.value;
+    const duration = +inputEditDuration.value;
+
+    let cadence;
+    let elevationGain;
+
+    // Checking if the original type and the new type are the same and changing the values of the inputs
+
+    if (workout.type == type) {
+      type == `running`
+        ? ((cadence = +inputEditCadence.value),
+          error(),
+          this._updateWorkout(workout, distance, duration, cadence, false))
+        : ((elevationGain = +inputEditElevation.value),
+          error(),
+          this._updateWorkout(
+            workout,
+            distance,
+            duration,
+            false,
+            elevationGain
+          ));
+    }
+
+    // Keeping the date from previous workout
+
+    const newDate = new Date(Date.parse(workout.date));
+    let newWorkout;
+
+    // Checking if the original type and the new type are'nt the same and changing the values of the inputs
+
+    if (workout.type != type) {
+      if (workout.type === `running` && type === `cycling`) {
+        elevationGain = +inputEditElevation.value;
+        error();
+        newWorkout = new Cycling(
+          workout.coords,
+          distance,
+          duration,
+          elevationGain,
+          newDate
+        );
+      }
+      if (workout.type === `cycling` && type === `running`) {
+        cadence = +inputEditCadence.value;
+        error();
+        newWorkout = new Running(
+          workout.coords,
+          distance,
+          duration,
+          cadence,
+          newDate
+        );
+      }
+
+      // Keeping the id from previous workout
+
+      // newWorkout.date = workout.date;
+      newWorkout.id = workout.id;
+
+      console.log(newDate.getDate());
+      console.log(newWorkout);
+
+      // Replacing the old workout with the new workout in #workouts array
+
+      this.#workouts.splice(workoutIndex, 1, newWorkout);
+
+      // Replacing the old workout with the new
+
+      this._renderWorkout(newWorkout, false, true);
+
+      // Updating the marker (markers array and marker element)
+
+      this._renderWorkoutMarker(newWorkout, true, false, true);
+    }
+
+    this._hideEditForm();
+  }
+
+  _updateWorkout(workout, distance, duration, cadence, elevation) {
+    workout.distance = distance;
+    workout.duration = duration;
+    workout.cadence
+      ? (workout.cadence = cadence)
+      : (workout.elevationGain = elevation);
+    workout.pace
+      ? (workout.pace = duration / distance)
+      : (workout.speed = distance / (duration / 60));
   }
 
   _clicksHandle(e) {
@@ -571,7 +641,7 @@ class App {
       document.querySelectorAll(`.workout`).forEach(element => {
         element.classList.remove(`edit`);
       });
-      this._editWorkout(e);
+      this._renderEditForm(e);
     }
   }
 
