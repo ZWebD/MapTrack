@@ -46,7 +46,6 @@ class Running extends Workout {
     this.calcPace();
     this._setDescription(desc);
     this.cadence = cadence;
-    console.log(desc);
   }
 
   calcPace() {
@@ -61,9 +60,9 @@ class Cycling extends Workout {
   constructor(coords, distance, duration, elevationGain, desc = false) {
     super(coords, distance, duration);
     this.calcSpeed();
+    console.log(desc);
     this._setDescription(desc);
     this.elevationGain = elevationGain;
-    console.log(desc);
   }
 
   calcSpeed() {
@@ -450,10 +449,12 @@ class App {
         key == `distance` ||
         key == `duration` ||
         key == `cadence` ||
-        key == `elevation`
+        key == `elevationGain`
       ) {
         editForm
-          .querySelector(`.form__input--${key}`)
+          .querySelector(
+            `.form__input--${key == `elevationGain` ? `elevation` : key}`
+          )
           .setAttribute(`value`, `${workout[key]}`);
       }
     });
@@ -503,21 +504,18 @@ class App {
 
     // Checking if the original type and the new type are the same and changing the values of the inputs
 
-    if (workout.type == type) {
-      type == `running`
-        ? ((cadence = +inputEditCadence.value),
-          error(),
-          this._updateWorkout(workout, distance, duration, cadence, false))
-        : ((elevationGain = +inputEditElevation.value),
-          error(),
-          this._updateWorkout(
-            workout,
-            distance,
-            duration,
-            false,
-            elevationGain
-          ));
+    // if (workout.type == type) {
+    if (type == `running`) {
+      cadence = +inputEditCadence.value;
+      error();
+      this._updateWorkout(workout, distance, duration, cadence, false);
     }
+    if (type == `cycling`) {
+      elevationGain = +inputEditElevation.value;
+      error();
+      this._updateWorkout(workout, distance, duration, false, elevationGain);
+    }
+    // }
 
     // Keeping the date from previous workout
 
@@ -538,6 +536,7 @@ class App {
           newDate
         );
       }
+
       if (workout.type === `cycling` && type === `running`) {
         cadence = +inputEditCadence.value;
         error();
@@ -562,13 +561,16 @@ class App {
 
       this.#workouts.splice(workoutIndex, 1, newWorkout);
 
-      // Replacing the old workout with the new
+      // Replacing the old workout with the new values
 
       this._renderWorkout(newWorkout, false, true);
 
       // Updating the marker (markers array and marker element)
 
       this._renderWorkoutMarker(newWorkout, true, false, true);
+
+      // Updating Local Storage
+      this._setLocalStorage();
     }
 
     this._hideEditForm();
@@ -583,6 +585,17 @@ class App {
     workout.pace
       ? (workout.pace = duration / distance)
       : (workout.speed = distance / (duration / 60));
+
+    // Replacing the old workout with the new values
+
+    this._renderWorkout(workout, false, true);
+
+    // Updating the marker (markers array and marker element)
+
+    this._renderWorkoutMarker(workout, true, false, true);
+
+    // Updating Local Storage
+    this._setLocalStorage();
   }
 
   _clicksHandle(e) {
@@ -628,7 +641,14 @@ class App {
       }
     }
 
-    // Show All workout markers on the map
+    // Handling menu functions
+
+    // Removing active class from the link if is active
+    document
+      .querySelectorAll('.menu__link.active')
+      .forEach(link => link.classList.remove('active'));
+
+    // Show All workout markers on the map from the menu
 
     if (e.target.closest(`.menu__option--show`)) {
       // e.preventDefault();
@@ -636,12 +656,29 @@ class App {
       this.#map.fitBounds(group.getBounds());
     }
 
+    // Adding active class to the link
+
+    if (e.target.closest('.menu__link'))
+      e.target.closest('.menu__link').classList.add('active');
+
+    // Revolve editing form
+
     if (e.target.closest(`.edit__workout`)) {
       e.preventDefault;
       document.querySelectorAll(`.workout`).forEach(element => {
         element.classList.remove(`edit`);
       });
       this._renderEditForm(e);
+    }
+
+    // Showing the Delete confirmation form
+
+    if (e.target.closest('.menu__option--delete')) {
+      e.preventDefault();
+
+      document
+        .querySelector('.delete-confirmation')
+        .classList.remove('delete-confirmation--hidden');
     }
   }
 
