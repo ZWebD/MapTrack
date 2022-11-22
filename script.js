@@ -86,7 +86,7 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
-const workoutHead = document.querySelector(`.workout__head`);
+// const workoutHead = document.querySelector(`.workout__head`);
 const map = document.querySelector(`#map`);
 const editForm = document.querySelector(`.editForm`);
 const inputEditType = editForm.querySelector('.form__input--type');
@@ -94,9 +94,11 @@ const inputEditDistance = editForm.querySelector('.form__input--distance');
 const inputEditDuration = editForm.querySelector('.form__input--duration');
 const inputEditCadence = editForm.querySelector('.form__input--cadence');
 const inputEditElevation = editForm.querySelector('.form__input--elevation');
+const deletingForm = document.querySelector('.delete-confirmation');
 
 class App {
   #map;
+  #coords = [];
   #mapZoomLevel = 13;
   #mapEvent;
   #workouts = [];
@@ -123,10 +125,6 @@ class App {
 
     // Click event
     document.body.addEventListener(`click`, this._clicksHandle.bind(this));
-
-    // containerWorkouts.addEventListener(`click`, this._moveToPopup.bind(this));
-    // containerWorkouts.addEventListener(`click`, this._clicksHandle.bind(this));
-    // document.addEventListener(`click`, this._clicksHandle.bind(this));
   }
 
   _getPosition() {
@@ -144,8 +142,8 @@ class App {
     const { longitude } = position.coords;
     // console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
 
-    const coords = [latitude, longitude];
-    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
+    this.#coords = [latitude, longitude];
+    this.#map = L.map('map').setView(this.#coords, this.#mapZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
@@ -202,7 +200,7 @@ class App {
   }
 
   //////////////////////////////////////////////////////////////
-  // When is toggle change the value empty !!!!!!!!!!!!
+  // When is toggle changing the value empty !!!!!!!!!!!!
   //////////////////////////////////////////////////////////
 
   _changeEditFormElevationField(e) {
@@ -323,22 +321,6 @@ class App {
     );
     mark.bindPopup(pop).openPopup();
     if (newMarker) this.#workoutMarkers.push(mark);
-
-    // if (editMarker) {
-    //   const markerIndex = this.#workoutMarkers.findIndex(mark => {
-    //     return (
-    //       mark._latlng.lat === workout.coords[0] &&
-    //       mark._latlng.lng === workout.coords[1]
-    //     );
-    //   });
-
-    //   // Deleting the old marker from UI (from the map)
-    //   this.#map.removeLayer(this.#workoutMarkers[markerIndex]);
-
-    //   // Replacing the old marker with the new one in the #workoutMarkers array
-    //   this.#workoutMarkers.splice(markerIndex, 1, mark);
-    //   // console.log(this.#workoutMarkers);
-    // }
   }
 
   _renderWorkout(workout, addNew = true, update = false) {
@@ -419,8 +401,6 @@ class App {
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
-
-    console.log(workout);
 
     // Put in position the edit form and hid workout
 
@@ -598,6 +578,84 @@ class App {
     this._setLocalStorage();
   }
 
+  _removeWorkout(e) {
+    // Identification of the workout that has to be deleted
+    const el = e.target.closest('.workout');
+
+    // Delete marker from Markers UI and workoutMarkers array
+    const workoutCoords = this.#workouts.find(
+      workout => workout.id === el.dataset.id
+    ).coords;
+
+    const markerIndex = this.#workoutMarkers.findIndex(marker => {
+      return (
+        marker._latlng.lat === workoutCoords[0] &&
+        marker._latlng.lng === workoutCoords[1]
+      );
+    });
+    this.#map.removeLayer(this.#workoutMarkers[markerIndex]); // Delete from marker list
+    this.#workoutMarkers.splice(markerIndex, 1); // Delete from workoutMarkers Array
+
+    // Delete workout from workout Arrays
+    const index = this.#workouts.findIndex(
+      workout => workout.id === el.dataset.id
+    );
+    this.#workouts.splice(index, 1);
+
+    // Delete workout from list in UI
+    el.remove();
+
+    // Checking if the workout array is empty or not, If it is, this function will disable all menu links
+    this._checkWorkouts();
+
+    // Updating localStorage or resetting it if there are no more workouts
+    if (this.#workouts.length !== 0) {
+      this._setLocalStorage(); // Will overwrite the previous 'workout' item
+    } else {
+      localStorage.removeItem('workouts');
+
+      // Also, if we delete the last workout, the map should be positioned on user's initial coords
+      this.#map.setView(this.#coords, this.#mapZoomLevel, {
+        animate: true,
+        duration: 1.2,
+      });
+    }
+  }
+
+  _deleteAllWorkout() {
+    this.#workouts.splice(0);
+    // console.log(this.#workouts);
+
+    const deleteFn = function () {
+      // Delete all workouts from List
+      document
+        .querySelectorAll('.workout')
+        .forEach(workoutEl => workoutEl.remove());
+
+      // Delete all markers from Map
+      this.#workoutMarkers.forEach(marker => {
+        this.#map.removeLayer(marker);
+      });
+
+      // Delete all markers from workoutMarkers array
+      this.#workoutMarkers.splice(0);
+
+      // Positioning the map on the current location
+      this.#map.setView(this.#coords, this.#mapZoomLevel, {
+        animate: true,
+        duration: 1.2,
+      });
+
+      // After deleted all workouts the menu links should be disabled
+      this._checkWorkouts();
+    }.bind(this);
+
+    setTimeout(deleteFn, 600);
+
+    // Reset local Storage
+    localStorage.removeItem('workouts');
+  }
+
   _clicksHandle(e) {
     // Selecting workout and move to popup on the map
 
@@ -656,12 +714,12 @@ class App {
       this.#map.fitBounds(group.getBounds());
     }
 
-    // Adding active class to the link
+    // Adding active class to the link for highlighting the menu in use
 
     if (e.target.closest('.menu__link'))
       e.target.closest('.menu__link').classList.add('active');
 
-    // Revolve editing form
+    // Reveal editing form
 
     if (e.target.closest(`.edit__workout`)) {
       e.preventDefault;
@@ -671,14 +729,28 @@ class App {
       this._renderEditForm(e);
     }
 
+    // Remove individual workout bottom
+
+    if (e.target.closest(`.remove__workout`)) {
+      this._removeWorkout(e);
+    }
+
     // Showing the Delete confirmation form
 
     if (e.target.closest('.menu__option--delete')) {
       e.preventDefault();
 
-      document
-        .querySelector('.delete-confirmation')
-        .classList.remove('delete-confirmation--hidden');
+      deletingForm.classList.remove('delete-confirmation--hidden');
+    }
+    // Hiding the form if "Canceling" delete
+    if (e.target.closest(`.delete-confirmation__btn--no`)) {
+      deletingForm.classList.add('delete-confirmation--hidden');
+    }
+
+    // Hiding the form if "Yes" and delete the workouts
+    if (e.target.closest(`.delete-confirmation__btn--yes`)) {
+      deletingForm.classList.add('delete-confirmation--hidden');
+      this._deleteAllWorkout();
     }
   }
 
@@ -710,51 +782,6 @@ class App {
     });
   }
 
-  // _removeWorkout(e) {
-  //   // Identification of the workout that has to be removed
-  //   const el = e.target.closest('.workout');
-
-  //   // Remove marker from Markers UI and workoutMarkers array
-  //   const workoutCoords = this.#workouts.find(
-  //     workout => workout.id === el.dataset.id
-  //   ).coords;
-
-  //   const markerIndex = this.#workoutMarkers.findIndex(marker => {
-  //     return (
-  //       marker._latlng.lat === workoutCoords[0] &&
-  //       marker._latlng.lng === workoutCoords[1]
-  //     );
-  //   });
-
-  //   this.#map.removeLayer(this.#workoutMarkers[markerIndex]); // Remove from UI
-  //   this.#workoutMarkers.splice(markerIndex, 1); // Remove from workout Markers Array
-
-  //   // Remove workout from workout Arrays
-  //   const index = this.#workouts.findIndex(
-  //     workout => workout.id === el.dataset.id
-  //   );
-  //   this.#workouts.splice(index, 1);
-
-  //   // Remove workout from list in UI
-  //   el.remove();
-
-  //   // Checking if the workout array is empty or not, If it is, this function will disable all menu links
-  //   this._checkWorkouts();
-
-  //   // Updating localStorage or resetting it if there are no more workouts
-  //   if (this.#workouts.length !== 0) {
-  //     this._setLocalStorage(); // Will overwrite the previous 'workout' item
-  //   } else {
-  //     localStorage.removeItem('workouts');
-
-  //     // Also, if we remove the last workout, the map should be positioned on user's initial coords
-  //     this.#map.setView(this.#userCoords, this.#mapZoomLevel, {
-  //       animate: true,
-  //       duration: 1.2,
-  //     });
-  //   }
-  // }
-
   _setLocalStorage() {
     localStorage.setItem(`workouts`, JSON.stringify(this.#workouts));
   }
@@ -769,9 +796,6 @@ class App {
     this.#workouts.forEach(work => {
       this._renderWorkout(work);
     });
-
-    // console.log(this.#workouts[0].id);
-    // console.log(JSON.parse(localStorage.getItem(localStorage.key(`workouts`))));
   }
 
   reset() {
@@ -783,14 +807,4 @@ const app = new App();
 
 // To Do List:
 //
-//    - give the function of removing workouts
 //    - give the sort by option
-//    - give the editing function
-//
-//
-//
-//
-//
-//
-//
-//
