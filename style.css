@@ -59,10 +59,13 @@ a:visited {
   padding: 1.5rem 2.75rem;
   margin-bottom: 1.75rem;
   margin-top: 4rem;
-  font-size: 2rem;
+  font-size: 1.7rem;
+  font-weight: 600;
   text-align: center;
   color: var(--color-light--2);
-  height: 9.25rem;
+  border-left: 10px solid var(--color-light--1);
+  border-right: 10px solid var(--color-light--1);
+  /* height: 9.25rem; */
   transition: all 0.5s, transform 1ms;
 }
 .start.hidden {
@@ -93,12 +96,12 @@ a:visited {
   gap: 0.75rem 1.5rem;
 }
 .workout--running {
-  border-width: 0px 5px;
+  border-width: 0px 10px;
   border-style: solid;
   border-color: var(--color-brand--2);
 }
 .workout--cycling {
-  border-width: 0px 5px;
+  border-width: 0px 10px;
   border-style: solid;
   border-color: var(--color-brand--1);
 }
@@ -156,8 +159,8 @@ a:visited {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 2.5rem;
-  border-left: 5px solid red;
-  border-right: 5px solid red;
+  border-left: 10px solid red;
+  border-right: 10px solid red;
 
   /* Match height and activity boxes */
   height: 9.25rem;
@@ -177,8 +180,8 @@ a:visited {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 2.5rem;
-  border-left: 5px solid var(--color-light--1);
-  border-right: 5px solid var(--color-light--1);
+  border-left: 10px solid var(--color-light--1);
+  border-right: 10px solid var(--color-light--1);
 
   /* Match height and activity boxes */
   height: 9.25rem;
@@ -288,8 +291,8 @@ a:visited {
   padding: 1.5rem 2.25rem;
   margin-bottom: 1.75rem;
   cursor: pointer;
-  border-left: 5px solid var(--color-light--1);
-  border-right: 5px solid var(--color-light--1);
+  border-left: 10px solid var(--color-light--1);
+  border-right: 10px solid var(--color-light--1);
   /* box-shadow: 0rem 0rem 1rem 0.5rem #42474d; */
 }
 
@@ -403,8 +406,8 @@ a:visited {
   text-align: center;
   grid-template-columns: 1fr 1fr;
   gap: 0.5rem 2.5rem;
-  border-left: 5px solid red;
-  border-right: 5px solid red;
+  border-left: 10px solid red;
+  border-right: 10px solid red;
 
   /* Match height and activity boxes */
   height: 9.25rem;
