@@ -284,7 +284,8 @@ class App {
     // Render workout on list
     this._renderWorkout(workout);
 
-    // Hide form + clear input fields
+    // Hide start description, form and clear input fields
+    this._checkWorkouts();
     this._hideForm();
 
     // Set local storage to all workout
@@ -653,7 +654,7 @@ class App {
     setTimeout(deleteFn, 600);
 
     // Reset local Storage
-    localStorage.removeItem('workouts');
+    // localStorage.removeItem('workouts');
   }
 
   _clicksHandle(e) {
