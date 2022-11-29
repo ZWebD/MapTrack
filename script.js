@@ -86,7 +86,6 @@ const inputDistance = document.querySelector('.form__input--distance');
 const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
-// const workoutHead = document.querySelector(`.workout__head`);
 const map = document.querySelector(`#map`);
 const editForm = document.querySelector(`.editForm`);
 const inputEditType = editForm.querySelector('.form__input--type');
@@ -95,6 +94,8 @@ const inputEditDuration = editForm.querySelector('.form__input--duration');
 const inputEditCadence = editForm.querySelector('.form__input--cadence');
 const inputEditElevation = editForm.querySelector('.form__input--elevation');
 const deletingForm = document.querySelector('.delete-confirmation');
+const sortBy = document.querySelector('#sortBy');
+const sortOptions = document.querySelector(`.sorting-options`);
 
 class App {
   #map;
@@ -234,6 +235,7 @@ class App {
         document.querySelector(`.start`).classList.remove(`hidden`)
       : document.querySelector(`.menu`).classList.remove(`hidden`) &
         document.querySelector(`.start`).classList.add(`hidden`);
+    if (sortBy.textContent != `date`) sortBy.textContent = `Date`;
   }
 
   _newWorkout(e) {
@@ -654,7 +656,31 @@ class App {
     setTimeout(deleteFn, 600);
 
     // Reset local Storage
-    // localStorage.removeItem('workouts');
+    localStorage.removeItem('workouts');
+  }
+
+  _sortOptions() {
+    document
+      .querySelector(`.sorting-menu__options`)
+      .querySelectorAll(`.menu__option`)
+      .forEach(element => {
+        element.classList.remove(`hide`);
+      });
+    if (sortBy.textContent == `Date`) {
+      document.querySelector(`#sort-date`).classList.add(`hide`);
+    }
+    if (sortBy.textContent == `Distant`) {
+      document.querySelector(`#sort-distant`).classList.add(`hide`);
+    }
+    if (sortBy.textContent == `Duration`) {
+      document.querySelector(`#sort-duration`).classList.add(`hide`);
+    }
+    sortOptions.classList.remove(`sorting-options--hidden`);
+  }
+
+  _sortWorkouts(e) {
+    document.querySelector(`#sort-${e}`).classList.add(`hide`);
+    sortOptions.classList.add(`sorting-options--hidden`);
   }
 
   _clicksHandle(e) {
@@ -740,9 +766,9 @@ class App {
 
     if (e.target.closest('.menu__option--delete')) {
       e.preventDefault();
-
       deletingForm.classList.remove('delete-confirmation--hidden');
     }
+
     // Hiding the form if "Canceling" delete
     if (e.target.closest(`.delete-confirmation__btn--no`)) {
       deletingForm.classList.add('delete-confirmation--hidden');
@@ -752,6 +778,25 @@ class App {
     if (e.target.closest(`.delete-confirmation__btn--yes`)) {
       deletingForm.classList.add('delete-confirmation--hidden');
       this._deleteAllWorkout();
+    }
+
+    // Showing the Sorting options
+
+    if (e.target.closest('.menu__option--sort')) {
+      e.preventDefault();
+      this._sortOptions();
+    }
+
+    // Handling the Sorting options
+
+    if (
+      e.target.closest('#sort-date') ||
+      e.target.closest('#sort-distant') ||
+      e.target.closest('#sort-duration')
+    ) {
+      e.preventDefault();
+      this._sortWorkouts(e.target.textContent.toLowerCase());
+      sortBy.textContent = e.target.textContent;
     }
   }
 

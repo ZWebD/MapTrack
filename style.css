@@ -346,57 +346,76 @@ a:visited {
   fill: var(--color-brand--2);
 }
 
-.menu__option--sort {
-  position: relative;
+/* Sorting menu */
+
+.sorting-options {
+  background-color: var(--color-dark--2);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-light--1);
+  border-radius: 0 0 5px 5px;
+  padding: 1.5rem 2.25rem;
+  margin-top: -2.5rem;
+  margin-bottom: 1.75rem;
+  cursor: pointer;
+  border-left: 10px solid var(--color-light--1);
+  border-right: 10px solid var(--color-light--1);
 }
 
-.menu__menu-sort {
-  position: absolute;
-  top: calc(100% + 1rem);
-  right: 0;
-  background-color: #fff;
-  border-radius: 0.5rem;
-  min-width: 18rem;
-  padding: 0.5rem 0;
-  z-index: 1000;
-  box-shadow: 0rem 1rem 1rem -0.5rem rgba(0 0 0 / 50%);
-}
-
-.menu__menu-sort--hidden {
+.sorting-options--hidden {
   display: none;
 }
 
-.menu__menu-sort-options {
+.sorting-options .sorting-menu__options {
   list-style: none;
+  display: flex;
+  justify-content: space-around;
 }
 
-.menu__menu-sort-option:link,
-.menu__menu-sort-option:visited {
+.sorting-options .menu__link:link,
+.sorting-options .menu__link:visited {
   text-decoration: none;
-  display: block;
-  padding: 0.5rem 1rem;
-  color: var(--color-dark--2);
-  font-weight: 500;
+  color: inherit;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
 }
 
-.menu__menu-sort-option:hover,
-.menu__menu-sort-option:active {
-  color: var(--color-light--1);
+.sorting-options .menu__link:hover,
+.sorting-options .menu__link:active {
+  color: var(--color-light--2);
 }
 
-.menu__menu-sort-icon {
-  fill: var(--color-dark--2);
+.sorting-options .menu__link.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.sorting-options .menu__link.active {
+  color: var(--color-brand--2);
+}
+
+.sorting-options .menu__link .menu__icon {
+  fill: var(--color-light--2);
   width: 2rem;
   height: 2rem;
   margin-right: 0.5rem;
   transition: all 0.2s;
-  vertical-align: sub;
 }
 
-.menu__menu-sort-option:hover .menu__menu-sort-icon {
+.sorting-options .menu__link:hover .menu__icon {
   fill: var(--color-light--1);
 }
+
+.sorting-options .menu__link.active .menu__icon {
+  fill: var(--color-brand--2);
+}
+
+.sorting-options .menu__option.hide {
+  display: none;
+}
+
+/* Deleting form */
 
 .delete-confirmation {
   background-color: var(--color-dark--2);
