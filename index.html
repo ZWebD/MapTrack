@@ -34,6 +34,7 @@
       <a class="logo" target="" href="#">
         <img src="logo_mp.png" alt="Logo" />
       </a>
+
       <!-- Menu options -->
       <div class="menu">
         <ul class="menu__options">
@@ -49,40 +50,27 @@
           </li>
           <li class="menu__option menu__option--sort">
             <a class="menu__link" href="#">
-              <span>Sort (<em id="sort-choice">date</em>)</span>
+              <span>Sort (<em id="sortBy">Date</em>)</span>
             </a>
-            <!-- popup menu -->
-            <div class="menu__menu-sort menu__menu-sort--hidden">
-              <ul class="menu__menu-sort-options">
-                <li>
-                  <a
-                    class="menu__menu-sort-option menu__menu-sort-option--date"
-                    href="#"
-                  >
-                    Sort by date
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="menu__menu-sort-option menu__menu-sort-option--distance"
-                    href="#"
-                  >
-                    Sort by distance
-                  </a>
-                </li>
-                <li>
-                  <a
-                    class="menu__menu-sort-option menu__menu-sort-option--duration"
-                    href="#"
-                  >
-                    Sort by duration
-                  </a>
-                </li>
-              </ul>
-            </div>
           </li>
         </ul>
       </div>
+
+      <!-- Sorting options -->
+      <div class="sorting-options sorting-options--hidden">
+        <ul class="sorting-menu__options">
+          <li id="sort-date" class="menu__option">
+            <a href="#" class="menu__link"><span>Date</span></a>
+          </li>
+          <li id="sort-distant" class="menu__option">
+            <a href="#" class="menu__link"><span>Distant</span></a>
+          </li>
+          <li id="sort-duration" class="menu__option">
+            <a href="#" class="menu__link"><span>Duration</span></a>
+          </li>
+        </ul>
+      </div>
+
       <!-- Deleting confirmation form -->
       <div class="delete-confirmation delete-confirmation--hidden">
         <h4 class="delete-confirmation__title">
