@@ -126,6 +126,23 @@ class App {
 
     // Click event
     document.body.addEventListener(`click`, this._clicksHandle.bind(this));
+
+    this._checkMobile();
+  }
+
+  _checkMobile() {
+    if (window.innerWidth < 768) {
+      window.addEventListener('resize', function () {
+        if (
+          !form.classList.contains('hidden') ||
+          !editForm.classList.contains('hidden')
+        ) {
+          document.querySelector('.sidebar').style.maxHeight = '77%';
+        } else {
+          document.querySelector('.sidebar').style.maxHeight = '47%';
+        }
+      });
+    }
   }
 
   _getPosition() {
