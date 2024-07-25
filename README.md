@@ -1,7 +1,7 @@
 <h1>MapTrack</h1>
 
 <h1>Overview</h1>
-<p>The Exercise Tracker App is a user-friendly mobile application designed for fitness enthusiasts to record and manage running and cycling activities. Suitable for casual and professional athletes alike, it offers precise tracking and easy data management.</p>
+<p>The Exercise Tracker App is a user-friendly mobile application designed to record and manage running and cycling activities for fitness enthusiasts. Suitable for casual and professional athletes alike.</p>
 
 <h2>Key Features</h2>
     <ol>
@@ -24,5 +24,6 @@
             </ul>
         </li>
     </ol>
+    
 
 <img src="screencapture-serene-bonbon-84c4b5-netlify-app-2023-07-25-10_34_27.png" alt="screenshot">
