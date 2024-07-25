@@ -3,7 +3,7 @@
 <h1>Overview</h1>
 <p>The Exercise Tracker App is a user-friendly mobile application designed for fitness enthusiasts to record and manage running and cycling activities. Suitable for casual and professional athletes alike, it offers precise tracking and easy data management.</p>
 
-    <h2>Key Features</h2>
+<h2>Key Features</h2>
     <ol>
         <li><strong>Activity Recording:</strong>
             <ul>
