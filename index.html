@@ -30,157 +30,171 @@
     <title>MapTrack // Map your workouts</title>
   </head>
   <body>
-    <div class="sidebar">
-      <a class="logo" target="" href="#">
-        <img src="logo_mp.png" alt="Logo" />
-      </a>
+    <div id="container">
+      <div class="sidebar">
+        <div style="display: flex; flex-direction: column">
+          <a class="logo" target="" href="#">
+            <img src="logo_mp.png" alt="Logo" />
+          </a>
 
-      <!-- Menu options -->
-      <div class="menu">
-        <ul class="menu__options">
-          <li class="menu__option menu__option--show">
-            <a class="menu__link" href="#">
-              <span>Show All</span>
-            </a>
-          </li>
-          <li class="menu__option menu__option--delete">
-            <a class="menu__link" href="#">
-              <span>Delete All</span>
-            </a>
-          </li>
-          <li class="menu__option menu__option--sort">
-            <a class="menu__link" href="#">
-              <span>Sort (<em id="sortBy">Date</em>)</span>
-            </a>
-          </li>
-        </ul>
-      </div>
+          <!-- Menu options -->
+          <div class="menu">
+            <ul class="menu__options">
+              <li class="menu__option menu__option--show">
+                <a class="menu__link" href="#">
+                  <span>Show All</span>
+                </a>
+              </li>
+              <li class="menu__option menu__option--delete">
+                <a class="menu__link" href="#">
+                  <span>Delete All</span>
+                </a>
+              </li>
+              <li class="menu__option menu__option--sort">
+                <a class="menu__link" href="#">
+                  <span>Sort (<em id="sortBy">Date</em>)</span>
+                </a>
+              </li>
+            </ul>
+          </div>
 
-      <!-- Sorting options -->
-      <div class="sorting-options sorting-options--hidden">
-        <ul class="sorting-menu__options">
-          <li id="sort-date" class="menu__option">
-            <a href="#" class="menu__link"><span>Date</span></a>
-          </li>
-          <li id="sort-distant" class="menu__option">
-            <a href="#" class="menu__link"><span>Distant</span></a>
-          </li>
-          <li id="sort-duration" class="menu__option">
-            <a href="#" class="menu__link"><span>Duration</span></a>
-          </li>
-        </ul>
-      </div>
+          <!-- Sorting options -->
+          <div class="sorting-options sorting-options--hidden">
+            <ul class="sorting-menu__options">
+              <li id="sort-date" class="menu__option">
+                <a href="#" class="menu__link"><span>Date</span></a>
+              </li>
+              <li id="sort-distant" class="menu__option">
+                <a href="#" class="menu__link"><span>Distant</span></a>
+              </li>
+              <li id="sort-duration" class="menu__option">
+                <a href="#" class="menu__link"><span>Duration</span></a>
+              </li>
+            </ul>
+          </div>
 
-      <!-- Deleting confirmation form -->
-      <div class="delete-confirmation delete-confirmation--hidden">
-        <h4 class="delete-confirmation__title">
-          Are you sure you want to delete all workouts?
-        </h4>
-        <div class="delete-confirmation__btns">
-          <button
-            type="button"
-            class="delete-confirmation__btn delete-confirmation__btn--yes"
-          >
-            ✅ Yes, I am 👍
-          </button>
-          <button
-            type="button"
-            class="delete-confirmation__btn delete-confirmation__btn--no"
-          >
-            ❌ Not really 😱
-          </button>
+          <!-- Deleting confirmation form -->
+          <div class="delete-confirmation delete-confirmation--hidden">
+            <h4 class="delete-confirmation__title">
+              Are you sure you want to delete all workouts?
+            </h4>
+            <div class="delete-confirmation__btns">
+              <button
+                type="button"
+                class="delete-confirmation__btn delete-confirmation__btn--yes"
+              >
+                ✅ Yes, I am 👍
+              </button>
+              <button
+                type="button"
+                class="delete-confirmation__btn delete-confirmation__btn--no"
+              >
+                ❌ Not really 😱
+              </button>
+            </div>
+          </div>
+
+          <div class="start">
+            <p>
+              For start, please click and place a marker on the map where you
+              did the workout.
+            </p>
+            <br />
+            <p>
+              When the workout form shows up, fill out the form and press
+              "Enter"!
+            </p>
+          </div>
+
+          <form class="form hidden">
+            <div class="form__row">
+              <label class="form__label">Type</label>
+              <select class="form__input form__input--type">
+                <option value="running">Running</option>
+                <option value="cycling">Cycling</option>
+              </select>
+            </div>
+            <div class="form__row">
+              <label class="form__label">Distance</label>
+              <input
+                class="form__input form__input--distance"
+                placeholder="km"
+              />
+            </div>
+            <div class="form__row">
+              <label class="form__label">Duration</label>
+              <input
+                class="form__input form__input--duration"
+                placeholder="min"
+              />
+            </div>
+            <div class="form__row">
+              <label class="form__label">Cadence</label>
+              <input
+                class="form__input form__input--cadence"
+                placeholder="step/min"
+              />
+            </div>
+            <div class="form__row form__row--hidden">
+              <label class="form__label">Elev Gain</label>
+              <input
+                class="form__input form__input--elevation"
+                placeholder="meters"
+              />
+            </div>
+            <button type="submit" class="form__btn">OK</button>
+          </form>
+
+          <ul class="workouts">
+            <form class="editForm hidden">
+              <div class="form__row">
+                <label class="form__label">Type</label>
+                <select class="form__input form__input--type">
+                  <option value="running">Running</option>
+                  <option value="cycling">Cycling</option>
+                </select>
+              </div>
+              <div class="form__row">
+                <label class="form__label">Distance</label>
+                <input
+                  class="form__input form__input--distance"
+                  placeholder="km"
+                />
+              </div>
+              <div class="form__row">
+                <label class="form__label">Duration</label>
+                <input
+                  class="form__input form__input--duration"
+                  placeholder="min"
+                />
+              </div>
+              <div class="form__row">
+                <label class="form__label">Cadence</label>
+                <input
+                  class="form__input form__input--cadence"
+                  placeholder="step/min"
+                />
+              </div>
+              <div class="form__row form__row--hidden">
+                <label class="form__label">Elev Gain</label>
+                <input
+                  class="form__input form__input--elevation"
+                  placeholder="meters"
+                />
+              </div>
+              <button type="submit" class="form__btn">OK</button>
+            </form>
+          </ul>
         </div>
-      </div>
-
-      <div class="start">
-        <p>
-          For start, please click and place a marker on the map where you did
-          the workout.
+        <p class="copyright">
+          &copy; Copyright by
+          <a class="copyright-link" target="_blank" href="#">Zoltan Szabo</a>.
+          This project is a modified version of "Mapty" App from Jonas
+          Schmedtmann - Udemy JavaScript Course.
         </p>
-        <br />
-        <p>
-          When the workout form shows up, fill out the form and press "Enter"!
-        </p>
       </div>
 
-      <form class="form hidden">
-        <div class="form__row">
-          <label class="form__label">Type</label>
-          <select class="form__input form__input--type">
-            <option value="running">Running</option>
-            <option value="cycling">Cycling</option>
-          </select>
-        </div>
-        <div class="form__row">
-          <label class="form__label">Distance</label>
-          <input class="form__input form__input--distance" placeholder="km" />
-        </div>
-        <div class="form__row">
-          <label class="form__label">Duration</label>
-          <input class="form__input form__input--duration" placeholder="min" />
-        </div>
-        <div class="form__row">
-          <label class="form__label">Cadence</label>
-          <input
-            class="form__input form__input--cadence"
-            placeholder="step/min"
-          />
-        </div>
-        <div class="form__row form__row--hidden">
-          <label class="form__label">Elev Gain</label>
-          <input
-            class="form__input form__input--elevation"
-            placeholder="meters"
-          />
-        </div>
-        <button type="submit" class="form__btn">OK</button>
-      </form>
-
-      <ul class="workouts">
-        <form class="editForm hidden">
-          <div class="form__row">
-            <label class="form__label">Type</label>
-            <select class="form__input form__input--type">
-              <option value="running">Running</option>
-              <option value="cycling">Cycling</option>
-            </select>
-          </div>
-          <div class="form__row">
-            <label class="form__label">Distance</label>
-            <input class="form__input form__input--distance" placeholder="km" />
-          </div>
-          <div class="form__row">
-            <label class="form__label">Duration</label>
-            <input
-              class="form__input form__input--duration"
-              placeholder="min"
-            />
-          </div>
-          <div class="form__row">
-            <label class="form__label">Cadence</label>
-            <input
-              class="form__input form__input--cadence"
-              placeholder="step/min"
-            />
-          </div>
-          <div class="form__row form__row--hidden">
-            <label class="form__label">Elev Gain</label>
-            <input
-              class="form__input form__input--elevation"
-              placeholder="meters"
-            />
-          </div>
-          <button type="submit" class="form__btn">OK</button>
-        </form>
-      </ul>
-      <p class="copyright">
-        &copy; Copyright by
-        <a class="copyright-link" target="_blank" href="#">Zoltan Szabo</a>.
-        This project is a modified version of "Mapty" App from Jonas Schmedtmann
-        - Udemy JavaScript Course.
-      </p>
+      <div id="map"></div>
     </div>
-
-    <div id="map"></div>
   </body>
 </html>

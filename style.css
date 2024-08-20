@@ -28,7 +28,7 @@ body {
   height: 100vh;
   overscroll-behavior-y: none;
   background-color: #fff;
-  padding: 2.5rem;
+  padding: 1rem;
 
   display: flex;
 }
@@ -39,13 +39,57 @@ a:visited {
   color: var(--color-brand--1);
 }
 
+#container {
+  flex-grow: 2;
+  display: flex;
+  flex-direction: row;
+}
+
+/* MAP */
+#map {
+  order: 2;
+  flex-basis: 60%;
+  max-width: 60%;
+  /* flex: 1; */
+  height: 100%;
+  background-color: var(--color-light--1);
+  position: relative;
+}
+
 /* SIDEBAR */
 .sidebar {
-  flex-basis: 50rem;
+  order: 1;
+  flex-basis: 40%;
+  min-width: 40%;
   background-color: var(--color-dark--1);
   padding: 3rem 5rem 4rem 5rem;
   display: flex;
   flex-direction: column;
+  position: relative;
+  justify-content: space-around;
+}
+
+@media (max-width: 840px) {
+  #container {
+    flex-direction: column; /* Stack elements vertically */
+  }
+
+  .sidebar,
+  #map {
+    flex-basis: 100%; /* Full width for both elements */
+    max-width: 100%;
+    height: auto;
+  }
+
+  .sidebar {
+    order: 1; /* Sidebar below the map */
+    max-height: 100%;
+  }
+
+  #map {
+    order: 2; /* Map below the sidebar */
+    min-height: 80%;
+  }
 }
 
 .logo {
@@ -58,7 +102,7 @@ a:visited {
   border-radius: 5px;
   padding: 1.5rem 2.75rem;
   margin-bottom: 1.75rem;
-  margin-top: 4rem;
+  margin-top: 2rem;
   font-size: 1.7rem;
   font-weight: 600;
   text-align: center;
@@ -75,9 +119,13 @@ a:visited {
 .workouts {
   position: relative;
   list-style: none;
-  height: 77vh;
+  height: auto;
   overflow-y: scroll;
   overflow-x: hidden;
+}
+
+.workouts.hidden {
+  display: none;
 }
 
 .workouts::-webkit-scrollbar {
@@ -249,13 +297,6 @@ a:visited {
 .copyright-link:hover,
 .copyright-link:active {
   color: var(--color-light--2);
-}
-
-/* MAP */
-#map {
-  flex: 1;
-  height: 100%;
-  background-color: var(--color-light--1);
 }
 
 /* Popup width is defined in JS using options */

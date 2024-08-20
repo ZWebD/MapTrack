@@ -232,8 +232,10 @@ class App {
   _checkWorkouts() {
     this.#workouts.length == 0
       ? document.querySelector(`.menu`).classList.add(`hidden`) &
-        document.querySelector(`.start`).classList.remove(`hidden`)
+        document.querySelector(`.start`).classList.remove(`hidden`) &
+        document.querySelector(`.workouts`).classList.add(`hidden`)
       : document.querySelector(`.menu`).classList.remove(`hidden`) &
+        document.querySelector(`.workouts`).classList.remove(`hidden`) &
         document.querySelector(`.start`).classList.add(`hidden`);
     if (sortBy.textContent != `date`) sortBy.textContent = `Date`;
   }
@@ -850,7 +852,3 @@ class App {
 }
 
 const app = new App();
-
-// To Do List:
-//
-//    - give the sort by option
